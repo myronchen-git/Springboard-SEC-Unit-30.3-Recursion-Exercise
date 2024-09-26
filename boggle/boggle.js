@@ -52,7 +52,45 @@ function makeBoard(boardString) {
 
 function find(board, word) {
   /** Can word be found in board? */
-  // TODO
+
+  if (word.length === 0) return false;
+
+  function _find(board, word, currentWordIndex, startLoc, visited) {
+    if (currentWordIndex >= word.length) return true;
+
+    visited.add(startLoc.toString());
+
+    for (let nextLoc of [
+      [startLoc[0] - 1, startLoc[1]],
+      [startLoc[0] + 1, startLoc[1]],
+      [startLoc[0], startLoc[1] - 1],
+      [startLoc[0], startLoc[1] + 1],
+    ]) {
+      if (
+        !visited.has(nextLoc.toString()) &&
+        nextLoc[0] >= 0 &&
+        nextLoc[0] < board.length &&
+        nextLoc[1] >= 0 &&
+        nextLoc[1] < board[nextLoc[0]].length &&
+        board[nextLoc[0]][nextLoc[1]] === word[currentWordIndex]
+      ) {
+        if (_find(board, word, currentWordIndex + 1, nextLoc, visited))
+          return true;
+      }
+    }
+
+    return false;
+  }
+
+  for (let i = 0; i < board.length; i++) {
+    for (let j = 0; j < board[i].length; j++) {
+      if (board[i][j] === word[0]) {
+        if (_find(board, word, 1, [i, j], new Set())) return true;
+      }
+    }
+  }
+
+  return false;
 }
 
 // EXAMPLE TEST
@@ -67,25 +105,25 @@ const board = makeBoard(`N C A N E
 
 // `NOON` should be found (0, 3) -> (1, 3) -> (2, 3) -> (2, 4)::
 
-console.log(find(board, "NOON"), true);
+console.log(find(board, 'NOON'), true);
 
 // `NOPE` should be found (0, 3) -> (1, 3) -> (1, 4) -> (0, 4)::
 
-console.log(find(board, "NOPE"), true);
+console.log(find(board, 'NOPE'), true);
 
 // `CANON` can't be found (`CANO` starts at (0, 1) but can't find
 // the last `N` and can't re-use the N)::
 
-console.log(find(board, "CANON"), false);
+console.log(find(board, 'CANON'), false);
 
 // You cannot travel diagonally in one move, which would be required
 // to find `QUINE`::
 
-console.log(find(board, "QUINE"), false);
+console.log(find(board, 'QUINE'), false);
 
 // We can recover if we start going down a false path (start 3, 0)::
 
-console.log(find(board, "FADED"), true);
+console.log(find(board, 'FADED'), true);
 
 // An extra tricky case --- it needs to find the `N` toward the top right,
 // and then go down, left, up, up, right to find all four `O`s and the `S`::
@@ -96,4 +134,4 @@ const board2 = makeBoard(`E D O S Z
                           Z Q Z O R
                           F A D P L`);
 
-console.log(find(board2, "NOOOOS"), true);
+console.log(find(board2, 'NOOOOS'), true);
