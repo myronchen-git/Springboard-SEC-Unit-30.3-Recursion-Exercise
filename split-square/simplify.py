@@ -50,8 +50,24 @@ Be careful that we don't "simplify" a set of matching mixed squares:
 def simplify(s):
     """Simplify a split square:"""
 
+    if type(s) == int:
+        return s
+
+    else:
+        out = []
+
+        for i in range(4):
+            out.append(simplify(s[i]))
+
+        if out == [0, 0, 0, 0]:
+            return 0
+        elif out == [1, 1, 1, 1]:
+            return 1
+        else:
+            return out
+
 
 if __name__ == "__main__":
     import doctest
     if doctest.testmod().failed == 0:
-        print "\n*** ALL TESTS PASS; YOU MADE THAT SEEM SIMPLE!!\n"
+        print("\n*** ALL TESTS PASS; YOU MADE THAT SEEM SIMPLE!!\n")
